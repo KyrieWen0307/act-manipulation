@@ -1,0 +1,30 @@
+# Python & virtual environments
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Data, checkpoints, and large outputs
+data/
+outputs/
+wandb/
+runs/
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.parquet
+*.mp4
+*.avi
+
+# Keep small demo GIFs in assets/ if explicitly added
+!assets/*.gif
+
+# Editor & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

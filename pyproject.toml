@@ -1,0 +1,9 @@
+[project]
+name = "act-manipulation"
+version = "0.1.0"
+description = "ACT (Action Chunking with Transformers) bimanual manipulation learning & ablation workspace"
+requires-python = ">=3.10"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["chapter01_cvae"]
