@@ -40,8 +40,8 @@ def test_kl_divergence_standard_normal_and_positive() -> None:
     assert kl_zero.ndim == 0, f"KL 返回值应为标量 (0 维张量)，实际维度为 {kl_zero.ndim}"
     assert torch.isclose(kl_zero, torch.tensor(0.0), atol=1e-6), f"标准正态时 KL 应为 0，实际为 {kl_zero.item()}"
 
-    mu_shifted = torch.ones(8, 32, requires_grad=True) * 2.0
-    log_var_shifted = torch.ones(8, 32, requires_grad=True) * (-1.0)
+    mu_shifted = torch.full((8, 32), 2.0, requires_grad=True)
+    log_var_shifted = torch.full((8, 32), -1.0, requires_grad=True)
     kl_pos = compute_kl_divergence(mu_shifted, log_var_shifted)
     assert kl_pos.item() > 0.0, "偏离标准正态分布时，KL 散度必须严格大于 0"
 

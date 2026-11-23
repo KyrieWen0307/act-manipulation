@@ -12,8 +12,8 @@
 
 | 章节 | 目录 | 核心任务 | 状态 |
 | :--- | :--- | :--- | :--- |
-| 第 1 章 | `chapter01_cvae/` | 原理过关 + 手动探索 Hugging Face 数据集 + 手写 `CVAEStyleEncoder`（重参数化、KL 散度、Padding Mask 隔离）与 `pytest` 单测 | `[ ] 进行中` |
-| 第 2 章 | `chapter02_mini_act/` | 手写 1D/2D 正弦位置编码 + Mini-ACT 主干（视觉 Token + Policy Encoder + Action Queries Cross-Attention Decoder + 推理强制 $z=0$） | `[ ] 待开始` |
+| 第 1 章 | `chapter01_cvae/` | 原理过关 + 手动探索 Hugging Face 数据集 + 手写 `CVAEStyleEncoder`（重参数化、KL 散度、Padding Mask 隔离）与 `pytest` 单测 | `[x] 已完成（5/5 单测通过）` |
+| 第 2 章 | `chapter02_mini_act/` | 手写 1D/2D 正弦位置编码 + Mini-ACT 主干（视觉 Token + Policy Encoder + Action Queries Cross-Attention Decoder + 推理强制 $z=0$） | `[ ] 下一章` |
 | 第 3 章 | `chapter03_loss_ensemble/` | 手写 Masked L1 + $\beta \cdot \text{KL}$ 联合损失、CPU 1-batch 过拟合冒烟与 Temporal Ensembling 平滑对比 | `[ ] 待开始` |
 | 第 4 章 | `chapter04_lerobot_baseline/` | LeRobot 数据审计 + 断点续训跑通 `lerobot/aloha_sim_transfer_cube_human` 50k 步基线 + 20 回合 MuJoCo 闭环评测与 GIF 留档 | `[ ] 待开始` |
 | 第 5 章 | `chapter05_ablation/` | 三组破坏性消融（推理策略消融 / `chunk_size` 消融 / `use_vae` 消融）与失败案例诊断复盘 | `[ ] 待开始` |

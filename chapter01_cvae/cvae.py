@@ -64,8 +64,9 @@ def reparameterize(mu: torch.Tensor, log_var: torch.Tensor) -> torch.Tensor:
     #   1) sigma = exp(0.5 * log_var)  -> torch.exp(0.5 * log_var)
     #   2) eps ~ N(0, I)               -> torch.randn_like(std)
     #   3) return mu + std * eps
-    raise NotImplementedError("请完成 TODO 1: reparameterize")
-
+    sigma = torch.exp(0.5 * log_var)
+    eps = torch.randn_like(sigma)
+    return mu + sigma * eps
 
 def compute_kl_divergence(mu: torch.Tensor, log_var: torch.Tensor) -> torch.Tensor:
     """计算后验分布 N(mu, sigma^2) 与标准正态先验 N(0, I) 之间的闭式 KL 散度。
@@ -88,8 +89,8 @@ def compute_kl_divergence(mu: torch.Tensor, log_var: torch.Tensor) -> torch.Tens
     # 工具箱提示:
     #   1) 逐元素项: -0.5 * (1.0 + log_var - mu.pow(2) - torch.exp(log_var))  -> [B, Z]
     #   2) 先对特征维 dim=-1 求和，再对 batch 维求均值 .mean() -> 标量 []
-    raise NotImplementedError("请完成 TODO 2: compute_kl_divergence")
-
+    kl = -0.5 * (1 + log_var - mu ** 2 - torch.exp(log_var)).sum(dim=-1).mean()
+    return kl
 
 class CVAEStyleEncoder(nn.Module):
     """ACT 的 CVAE 风格编码器（仅在训练期启用）。
@@ -149,7 +150,11 @@ class CVAEStyleEncoder(nn.Module):
         #                        再包进 nn.TransformerEncoder(encoder_layer, num_layers=num_layers)
         #   4) self.latent_proj: nn.Linear(d_model, 2 * latent_dim)
         #                        (一次输出拼接在一起的 [mu, log_var])
-        raise NotImplementedError("请完成 TODO 3: CVAEStyleEncoder.__init__")
+        self.state_proj = nn.Linear(self.state_dim, d_model)
+        self.action_proj = nn.Linear(action_dim, d_model)
+        encoder_layer = nn.TransformerEncoderLayer(d_model=d_model, nhead=nhead, dim_feedforward=dim_feedforward, dropout=dropout,batch_first=True,norm_first=True)
+        self.encoder = nn.TransformerEncoder(encoder_layer, num_layers=num_layers)
+        self.latent_proj = nn.Linear(d_model, 2 * latent_dim)
 
     def forward(
         self,
@@ -185,4 +190,17 @@ class CVAEStyleEncoder(nn.Module):
         #  10) 投影并拆分: mu, log_var = self.latent_proj(cls_out).chunk(2, dim=-1)  -> 各 [B, Z]
         #  11) 采样: z = reparameterize(mu, log_var)
         #  12) return z, mu, log_var
-        raise NotImplementedError("请完成 TODO 4: CVAEStyleEncoder.forward")
+        batch_size = state.shape[0]
+        state_token = self.state_proj(state).unsqueeze(1)
+        action_tokens = self.action_proj(actions)
+        cls_token = self.cls_embed.expand(batch_size, -1, -1)
+        x = torch.cat([cls_token, state_token, action_tokens], dim=1) + self.pos_embed
+        key_padding_mask = None
+        if action_is_pad is not None:
+            prefix_pad = torch.zeros((batch_size, 2), dtype=torch.bool, device=actions.device)
+            key_padding_mask = torch.cat([prefix_pad, action_is_pad.bool()], dim=1)
+        encoded = self.encoder(x, src_key_padding_mask=key_padding_mask)
+        cls_out = encoded[:, 0, :]
+        mu, log_var = self.latent_proj(cls_out).chunk(2, dim=-1) 
+        z = reparameterize(mu, log_var)
+        return z, mu, log_var
